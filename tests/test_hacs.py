@@ -1,0 +1,106 @@
+"""Tests for the HACS class."""
+
+from unittest.mock import AsyncMock, MagicMock, patch
+
+from homeassistant.core import HomeAssistant
+
+from custom_components.hacs.base import HacsBase
+from custom_components.hacs.enums import HacsCategory
+from custom_components.hacs.helpers.data import get_repositories
+from custom_components.hacs.repositories.hacs_repository import HacsRepository
+from custom_components.hacs.repositories.repository import Repository
+from custom_components.hacs.repositories.repository_data import RepositoryData
+from tests.common import MockHacs, MockHacsRepository, MockRepository, setup_integration
+
+
+@patch("custom_components.hacs.base.HacsBase.async_check_repository")
+async def test_get_repositories(mock_async_check_repository):
+    """Test that get_repositories returns the correct repositories."""
+    # Setup
+    mock_repository = MockRepository()
+    mock_repository.data.category = HacsCategory.INTEGRATION
+    mock_repository.data.installed = True
+    mock_repository.data.releases = MagicMock()
+    mock_repository.data.releases.get_by_tag = MagicMock(return_value="1.0.0")
+    mock_repository.data.releases.get_by_tag.return_value.tag = "1.0.0"
+    mock_repository.data.releases.get_by_tag.return_value.release = MagicMock()
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp_iso = 1672531200
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_iso = "2023-01-01T00:00:00Z"
+    mock_repository.data.releases.get_by_tag.return_value.release.published_at_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_datetime_timestamp = 1672531200
+    mock_repository
