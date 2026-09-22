@@ -23,3 +23,4 @@ async def test_validate_repository(hacs: HacsBase, version: str, name: str | Non
         assert manifest.name == name
     else:
         assert manifest is None
+
