@@ -70,3 +70,4 @@ async def test_remove_repository(
     await snapshots.assert_hacs_data(
         hacs, f"{category_test_data['repository']}/test_remove_repository_post.json"
     )
+
