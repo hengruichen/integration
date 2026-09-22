@@ -23,3 +23,4 @@ async def test_validate_repository(hacs: HacsBase, data: dict[str, Any], result:
     docs = await repository.get_documentation(filename="README.md")
 
     assert result in docs
+

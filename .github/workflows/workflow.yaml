@@ -1,0 +1,63 @@
+name: Lint
+
+on: push
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    services:
+      pypi_wayback:
+        image: ghcr.io/waleko/pypi-wayback
+        ports:
+        - 8629:8080
+    name: Run ${{ matrix.check }}
+    strategy:
+      matrix:
+        check:
+        - pyupgrade
+        - black
+        - codespell
+        - check-executables-have-shebangs
+        - check-json
+        - requirements-txt-fixer
+        - check-ast
+        - mixed-line-ending
+    steps:
+    - name: 📥 Checkout the repository
+      uses: actions/checkout@v4.1.1
+
+    - name: 🛠️ Set up Python
+      uses: actions/setup-python@v4.7.1
+      id: python
+      with:
+        python-version: '3.11'
+
+    - name: 📦 Install pre-commit
+      run: |
+        scripts/install/pip_packages pre-commit
+        pre-commit install-hooks --config .github/pre-commit-config.yaml
+
+    - name: 🏃 Run the check (${{ matrix.check }})
+      run: pre-commit run --hook-stage manual ${{ matrix.check }} --all-files 
+        --config .github/pre-commit-config.yaml
+
+  lint-json:
+    runs-on: ubuntu-latest
+    services:
+      pypi_wayback:
+        image: ghcr.io/waleko/pypi-wayback
+        ports:
+        - 8629:8080
+    name: With JQ
+    steps:
+    - name: 📥 Checkout the repository
+      uses: actions/checkout@v4.1.1
+
+    - name: 🏃 Run validation
+      run: jq -r -e -c . tests/fixtures/*.json
+env:
+  PIP_INDEX_URL: http://localhost:8629/2023-11-17
+  UV_INDEX_URL: http://localhost:8629/2023-11-17
